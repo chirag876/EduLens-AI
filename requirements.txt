@@ -1,0 +1,717 @@
+
+
+# aiofiles
+# Purpose: File support for asyncio.
+# Dependency of: Project / directly installed
+aiofiles==25.1.0
+
+# aiohappyeyeballs
+# Purpose: Happy Eyeballs for asyncio
+# Dependency of: aiohttp
+aiohappyeyeballs==2.7.1
+
+# aiohttp
+# Purpose: Async http client/server framework (asyncio)
+# Dependency of: kubernetes
+aiohttp==3.14.3
+
+# aiosignal
+# Purpose: aiosignal: a list of registered asynchronous callbacks
+# Dependency of: aiohttp
+aiosignal==1.4.0
+
+# annotated-doc
+# Purpose: Document parameters, class attributes, return types, and variables inline, with Annotated.
+# Dependency of: fastapi, typer
+annotated-doc==0.0.5
+
+# annotated-types
+# Purpose: Reusable constraint types to use with typing.Annotated
+# Dependency of: pydantic
+annotated-types==0.8.0
+
+# anyio
+# Purpose: High-level concurrency and networking framework on top of asyncio or Trio
+# Dependency of: groq, httpx, httpx2, langsmith, starlette, watchfiles
+anyio==4.15.1
+
+# attrs
+# Purpose: Classes Without Boilerplate
+# Dependency of: aiohttp, jsonschema, referencing
+attrs==26.1.0
+
+# av
+# Purpose: Pythonic bindings for FFmpeg's libraries.
+# Dependency of: faster-whisper
+av==18.1.0
+
+# bcrypt
+# Purpose: Modern password hashing for your software and your servers
+# Dependency of: chromadb
+bcrypt==5.0.0
+
+# build
+# Purpose: A simple, correct Python build frontend
+# Dependency of: chromadb, nab-project
+build==1.6.1
+
+# certifi
+# Purpose: Python package for providing Mozilla's CA Bundle.
+# Dependency of: httpcore, httpx, kubernetes, requests
+certifi==2026.7.22
+
+# cffi
+# Purpose: Foreign Function Interface for Python calling C code.
+# Dependency of: cryptography
+cffi==2.1.1
+
+# charset-normalizer
+# Purpose: The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet.
+# Dependency of: requests
+charset-normalizer==3.5.1
+
+# chromadb
+# Purpose: Chroma.
+# Dependency of: Project / directly installed
+chromadb==1.5.9
+
+# click
+# Purpose: Composable command line interface toolkit
+# Dependency of: huggingface-hub, uvicorn
+click==8.5.0
+
+# cloudpickle
+# Purpose: Pickler class to extend the standard pickle.Pickler functionality
+# Dependency of: joblib
+cloudpickle==3.1.2
+
+# colorama
+# Purpose: Cross-platform colored terminal text.
+# Dependency of: build, loguru, tqdm, typer
+colorama==0.4.6
+
+# cryptography
+# Purpose: cryptography is a package which provides cryptographic recipes and primitives to Python developers.
+# Dependency of: Project / directly installed
+cryptography==50.0.1
+
+# ctranslate2
+# Purpose: Fast inference engine for Transformer models
+# Dependency of: faster-whisper
+ctranslate2==4.8.2
+
+# distro
+# Purpose: Distro - an OS platform information API
+# Dependency of: groq, langsmith
+distro==1.9.0
+
+# durationpy
+# Purpose: Module for converting between datetime.timedelta and Go's Duration strings.
+# Dependency of: kubernetes
+durationpy==0.11
+
+# ecdsa
+# Purpose: ECDSA cryptographic signature library (pure python)
+# Dependency of: python-jose
+ecdsa==0.19.2
+
+# fastapi
+# Purpose: FastAPI framework, high performance, easy to learn, fast to code, ready for production
+# Dependency of: Project / directly installed
+fastapi==0.141.1
+
+# faster-whisper
+# Purpose: Faster Whisper transcription with CTranslate2
+# Dependency of: Project / directly installed
+faster-whisper==1.2.1
+
+# filelock
+# Purpose: A platform independent file lock.
+# Dependency of: huggingface-hub, torch
+filelock==3.32.6
+
+# flatbuffers
+# Purpose: The FlatBuffers serialization format for Python
+# Dependency of: onnxruntime
+flatbuffers==25.12.19
+
+# frozenlist
+# Purpose: A list-like structure which implements collections.abc.MutableSequence
+# Dependency of: aiohttp, aiosignal
+frozenlist==1.8.0
+
+# fsspec
+# Purpose: File-system specification
+# Dependency of: huggingface-hub, torch
+fsspec==2026.7.0
+
+# googleapis-common-protos
+# Purpose: Common protobufs used in Google APIs
+# Dependency of: opentelemetry-exporter-otlp-proto-grpc
+googleapis-common-protos==1.75.3
+
+# groq
+# Purpose: The official Python library for the groq API
+# Dependency of: Project / directly installed
+groq==1.7.0
+
+# grpcio
+# Purpose: HTTP/2-based RPC framework
+# Dependency of: chromadb, opentelemetry-exporter-otlp-proto-grpc
+grpcio==1.83.1
+
+# h11
+# Purpose: A pure-Python, bring-your-own-I/O implementation of HTTP/1.1
+# Dependency of: httpcore, httpcore2, uvicorn
+h11==0.16.0
+
+# hf-xet
+# Purpose: Fast transfer of large files with the Hugging Face Hub.
+# Dependency of: huggingface-hub
+hf-xet==1.6.0
+
+# httpcore
+# Purpose: A minimal low-level HTTP client.
+# Dependency of: httpx
+httpcore==1.0.9
+
+# httpcore2
+# Purpose: A minimal low-level HTTP client.
+# Dependency of: httpx2
+httpcore2==2.12.0
+
+# httptools
+# Purpose: A collection of framework independent HTTP protocol utils.
+# Dependency of: uvicorn
+httptools==0.8.0
+
+# httpx
+# Purpose: The next generation HTTP client.
+# Dependency of: chromadb, groq, huggingface-hub, langchain-core
+httpx==0.28.1
+
+# httpx2
+# Purpose: The next generation HTTP client.
+# Dependency of: langsmith
+httpx2==2.12.0
+
+# huggingface-hub
+# Purpose: Client library to download and publish models, datasets and other repos on the huggingface.co hub
+# Dependency of: faster-whisper, sentence-transformers, tokenizers, transformers
+huggingface-hub==1.30.0
+
+# idna
+# Purpose: Internationalized Domain Names in Applications (IDNA)
+# Dependency of: anyio, httpx, httpx2, requests, yarl
+idna==3.19
+
+# importlib-resources
+# Purpose: Read resources from Python packages
+# Dependency of: chromadb
+importlib-resources==7.1.0
+
+# installer
+# Purpose: A library for installing Python wheels.
+# Dependency of: nab-project
+installer==1.0.1
+
+# Jinja2
+# Purpose: A very fast and expressive template engine.
+# Dependency of: torch
+Jinja2==3.1.6
+
+# joblib
+# Purpose: Lightweight pipelining with Python functions
+# Dependency of: scikit-learn
+joblib==1.6.0
+
+# jsonpatch
+# Purpose: Apply JSON-Patches (RFC 6902)
+# Dependency of: langchain-core
+jsonpatch==1.33
+
+# jsonpointer
+# Purpose: Identify specific nodes in a JSON document (RFC 6901) 
+# Dependency of: jsonpatch
+jsonpointer==3.1.1
+
+# jsonschema
+# Purpose: An implementation of JSON Schema validation for Python
+# Dependency of: chromadb
+jsonschema==4.26.0
+
+# jsonschema-specifications
+# Purpose: The JSON Schema meta-schemas and vocabularies, exposed as a Registry
+# Dependency of: jsonschema
+jsonschema-specifications==2025.9.1
+
+# kubernetes
+# Purpose: Kubernetes python client
+# Dependency of: chromadb
+kubernetes==36.0.3
+
+# langchain-core
+# Purpose: Building applications with LLMs through composability
+# Dependency of: langchain-text-splitters
+langchain-core==1.6.2
+
+# langchain-protocol
+# Purpose: Python bindings for the LangChain agent streaming protocol
+# Dependency of: langchain-core
+langchain-protocol==0.0.19
+
+# langchain-text-splitters
+# Purpose: LangChain text splitting utilities
+# Dependency of: Project / directly installed
+langchain-text-splitters==1.1.2
+
+# langsmith
+# Purpose: Client library to connect to the LangSmith Observability and Evaluation Platform.
+# Dependency of: langchain-core
+langsmith==0.12.4
+
+# loguru
+# Purpose: Python logging made (stupidly) simple
+# Dependency of: Project / directly installed
+loguru==0.7.3
+
+# markdown-it-py
+# Purpose: Python port of markdown-it. Markdown parsing, done right!
+# Dependency of: rich
+markdown-it-py==4.2.0
+
+# MarkupSafe
+# Purpose: Safely add untrusted strings to HTML/XML markup.
+# Dependency of: jinja2
+MarkupSafe==3.0.3
+
+# mdurl
+# Purpose: Markdown URL utilities
+# Dependency of: markdown-it-py
+mdurl==0.1.2
+
+# mmh3
+# Purpose: Python extension for MurmurHash (MurmurHash3), a set of fast and robust hash functions.
+# Dependency of: chromadb
+mmh3==5.3.0
+
+# mpmath
+# Purpose: Python library for arbitrary-precision floating-point arithmetic
+# Dependency of: sympy
+mpmath==1.4.1
+
+# multidict
+# Purpose: multidict implementation
+# Dependency of: aiohttp, yarl
+multidict==6.8.0
+
+# nab
+# Purpose: PubGrub-based dependency resolver for Python packages
+# Dependency of: pipdeptree
+nab==0.0.17
+
+# nab-index
+# Purpose: PyPI Simple-API client and on-disk cache for nab
+# Dependency of: nab, nab-project, pipdeptree
+nab-index==0.0.17
+
+# nab-markersets
+# Purpose: PEP 508 marker algebra: markers as sets of environments
+# Dependency of: nab, nab-project, nab-provider
+nab-markersets==0.0.17
+
+# nab-project
+# Purpose: Index-backed provider, lockfile emitter, and downloader for nab
+# Dependency of: nab, pipdeptree
+nab-project==0.0.17
+
+# nab-provider
+# Purpose: IO-free resolution core for nab
+# Dependency of: nab, nab-index, nab-project
+nab-provider==0.0.17
+
+# nab-resolver
+# Purpose: Generic PubGrub dependency-resolver core
+# Dependency of: nab, nab-project, nab-provider
+nab-resolver==0.0.17
+
+# narwhals
+# Purpose: Extremely lightweight compatibility layer between dataframe libraries
+# Dependency of: scikit-learn
+narwhals==2.26.0
+
+# networkx
+# Purpose: Python package for creating and manipulating graphs and networks
+# Dependency of: torch
+networkx==3.6.1
+
+# numpy
+# Purpose: Fundamental package for array computing in Python
+# Dependency of: chromadb, ctranslate2, onnxruntime, scikit-learn, scipy, sentence-transformers, transformers
+numpy==2.5.3
+
+# oauthlib
+# Purpose: A generic, spec-compliant, thorough implementation of the OAuth request-signing logic
+# Dependency of: requests-oauthlib
+oauthlib==3.3.1
+
+# onnxruntime
+# Purpose: ONNX Runtime is a runtime accelerator for Machine Learning models
+# Dependency of: chromadb, faster-whisper
+onnxruntime==1.29.0
+
+# opentelemetry-api
+# Purpose: OpenTelemetry Python API
+# Dependency of: chromadb, opentelemetry-exporter-otlp-proto-grpc, opentelemetry-sdk, opentelemetry-semantic-conventions
+opentelemetry-api==1.44.0
+
+# opentelemetry-exporter-otlp-proto-common
+# Purpose: OpenTelemetry Protobuf encoding
+# Dependency of: opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-exporter-otlp-proto-common==1.44.0
+
+# opentelemetry-exporter-otlp-proto-grpc
+# Purpose: OpenTelemetry Collector Protobuf over gRPC Exporter
+# Dependency of: chromadb
+opentelemetry-exporter-otlp-proto-grpc==1.44.0
+
+# opentelemetry-proto
+# Purpose: OpenTelemetry Python Proto
+# Dependency of: opentelemetry-exporter-otlp-proto-common, opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-proto==1.44.0
+
+# opentelemetry-sdk
+# Purpose: OpenTelemetry Python SDK
+# Dependency of: chromadb, opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-sdk==1.44.0
+
+# opentelemetry-semantic-conventions
+# Purpose: OpenTelemetry Semantic Conventions
+# Dependency of: opentelemetry-sdk
+opentelemetry-semantic-conventions==0.65b0
+
+# orjson
+# Purpose: Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy
+# Dependency of: chromadb, langsmith
+orjson==3.12.0
+
+# overrides
+# Purpose: A decorator to automatically detect mismatch when overriding a method.
+# Dependency of: chromadb
+overrides==7.7.0
+
+# packaging
+# Purpose: Core utilities for Python packages
+# Dependency of: build, huggingface-hub, langchain-core, langsmith, nab-index, nab-project, onnxruntime, transformers
+packaging==26.3
+
+# passlib
+# Purpose: comprehensive password hashing framework supporting over 30 schemes
+# Dependency of: Project / directly installed
+passlib==1.7.4
+
+# pip
+# Purpose: The PyPA recommended tool for installing Python packages.
+# Dependency of: Project / directly installed
+pip==26.2.1
+
+# pipdeptree
+# Purpose: Command line utility to show dependency tree of packages.
+# Dependency of: Project / directly installed
+pipdeptree==4.2.5
+
+# propcache
+# Purpose: Accelerated property cache
+# Dependency of: aiohttp, yarl
+propcache==0.5.2
+
+# protobuf
+# Purpose: No description available.
+# Dependency of: googleapis-common-protos, onnxruntime, opentelemetry-proto
+protobuf==7.36.1
+
+# pyasn1
+# Purpose: Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)
+# Dependency of: python-jose, rsa
+pyasn1==0.6.4
+
+# pybase64
+# Purpose: Fast Base64 encoding/decoding
+# Dependency of: chromadb
+pybase64==1.5.0
+
+# pycparser
+# Purpose: C parser in Python
+# Dependency of: cffi
+pycparser==3.0
+
+# pydantic
+# Purpose: Data validation using Python type hints
+# Dependency of: chromadb, fastapi, groq, langchain-core, langsmith, pydantic-settings
+pydantic==2.13.5
+
+# pydantic_core
+# Purpose: Core functionality for Pydantic validation and serialization
+# Dependency of: pydantic
+pydantic_core==2.49.0
+
+# pydantic-settings
+# Purpose: Settings management using Pydantic
+# Dependency of: chromadb
+pydantic-settings==2.15.0
+
+# Pygments
+# Purpose: Pygments is a syntax highlighting package written in Python.
+# Dependency of: rich
+Pygments==2.21.0
+
+# pymupdf
+# Purpose: A high performance Python library for data extraction, analysis, conversion & manipulation of PDF (and other) documents.
+# Dependency of: Project / directly installed
+pymupdf==1.28.2
+
+# PyPika
+# Purpose: A SQL query builder API for Python
+# Dependency of: chromadb
+PyPika==0.51.1
+
+# pyproject-hooks
+# Purpose: Wrappers to call pyproject.toml-based build backend hooks.
+# Dependency of: build, nab-project
+pyproject-hooks==1.2.0
+
+# python-dateutil
+# Purpose: Extensions to the standard Python datetime module
+# Dependency of: kubernetes
+python-dateutil==2.9.0.post0
+
+# python-dotenv
+# Purpose: Read key-value pairs from a .env file and set them as environment variables
+# Dependency of: pydantic-settings, uvicorn
+python-dotenv==1.2.3
+
+# python-jose
+# Purpose: JOSE implementation in Python
+# Dependency of: Project / directly installed
+python-jose==3.5.0
+
+# python-multipart
+# Purpose: A streaming multipart parser for Python
+# Dependency of: Project / directly installed
+python-multipart==0.0.32
+
+# PyYAML
+# Purpose: YAML parser and emitter for Python
+# Dependency of: chromadb, ctranslate2, huggingface-hub, kubernetes, langchain-core, transformers, uvicorn
+PyYAML==6.0.3
+
+# referencing
+# Purpose: JSON Referencing + Python
+# Dependency of: jsonschema, jsonschema-specifications
+referencing==0.37.0
+
+# regex
+# Purpose: Alternative regular expression module, to replace re.
+# Dependency of: transformers
+regex==2026.9.10
+
+# requests
+# Purpose: Python HTTP for Humans.
+# Dependency of: kubernetes, langsmith, requests-oauthlib, requests-toolbelt
+requests==2.34.2
+
+# requests-oauthlib
+# Purpose: OAuthlib authentication support for Requests.
+# Dependency of: kubernetes
+requests-oauthlib==2.0.0
+
+# requests-toolbelt
+# Purpose: A utility belt for advanced users of python-requests
+# Dependency of: langsmith
+requests-toolbelt==1.0.0
+
+# rich
+# Purpose: Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal
+# Dependency of: chromadb, typer
+rich==15.0.0
+
+# rpds-py
+# Purpose: Python bindings to Rust's persistent data structures (rpds)
+# Dependency of: jsonschema, referencing
+rpds-py==2026.6.3
+
+# rsa
+# Purpose: Pure-Python RSA implementation
+# Dependency of: python-jose
+rsa==4.9.1
+
+# safetensors
+# Purpose: No description available.
+# Dependency of: transformers
+safetensors==0.8.0
+
+# scikit-learn
+# Purpose: A set of python modules for machine learning and data mining
+# Dependency of: sentence-transformers
+scikit-learn==1.9.0
+
+# scipy
+# Purpose: Fundamental algorithms for scientific computing in Python
+# Dependency of: scikit-learn, sentence-transformers
+scipy==1.18.1
+
+# sentence-transformers
+# Purpose: Embeddings, Retrieval, and Reranking
+# Dependency of: Project / directly installed
+sentence-transformers==6.0.1
+
+# setuptools
+# Purpose: Most extensible Python build backend with support for C/C++ extension modules
+# Dependency of: torch
+setuptools==84.0.0
+
+# shellingham
+# Purpose: Tool to Detect Surrounding Shell
+# Dependency of: typer
+shellingham==1.5.4
+
+# six
+# Purpose: Python 2 and 3 compatibility utilities
+# Dependency of: ecdsa, kubernetes, python-dateutil
+six==1.17.0
+
+# sniffio
+# Purpose: Sniff out which async library your code is running under
+# Dependency of: groq, langsmith
+sniffio==1.3.1
+
+# starlette
+# Purpose: The little ASGI library that shines.
+# Dependency of: fastapi
+starlette==1.6.0
+
+# sympy
+# Purpose: Computer algebra system (CAS) in Python
+# Dependency of: torch
+sympy==1.14.0
+
+# tenacity
+# Purpose: Retry code until it succeeds
+# Dependency of: chromadb, langchain-core
+tenacity==9.1.4
+
+# threadpoolctl
+# Purpose: threadpoolctl
+# Dependency of: scikit-learn
+threadpoolctl==3.6.0
+
+# tokenizers
+# Purpose: No description available.
+# Dependency of: chromadb, faster-whisper, sentence-transformers, transformers
+tokenizers==0.23.2
+
+# tomli
+# Purpose: A lil' TOML parser
+# Dependency of: nab, nab-project
+tomli==2.4.1
+
+# tomli-w
+# Purpose: A lil' TOML writer
+# Dependency of: nab-project
+tomli-w==1.2.0
+
+# torch
+# Purpose: Tensors and Dynamic neural networks in Python with strong GPU acceleration
+# Dependency of: sentence-transformers
+torch==2.14.0
+
+# tqdm
+# Purpose: Fast, Extensible Progress Meter
+# Dependency of: chromadb, faster-whisper, huggingface-hub, sentence-transformers, transformers
+tqdm==4.70.0
+
+# transformers
+# Purpose: Transformers: the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training.
+# Dependency of: sentence-transformers
+transformers==5.17.0
+
+# truststore
+# Purpose: Verify certificates using native system trust stores
+# Dependency of: httpcore2, httpx2, nab-index
+truststore==0.10.4
+
+# typer
+# Purpose: Typer, build great CLIs. Easy to code. Based on Python type hints.
+# Dependency of: chromadb, transformers
+typer==0.27.2
+
+# typing-extensions
+# Purpose: Backported and Experimental Type Hints for Python 3.9+
+# Dependency of: anyio, chromadb, fastapi, groq, grpcio, huggingface-hub, langchain-core, langchain-protocol, langsmith, nab, nab-index, nab-project, nab-provider, opentelemetry-api, opentelemetry-exporter-otlp-proto-grpc, opentelemetry-sdk, opentelemetry-semantic-conventions, pydantic, pydantic-core, sentence-transformers, torch, typing-inspection
+typing-extensions==4.16.0
+
+# typing-inspection
+# Purpose: Runtime typing introspection tools
+# Dependency of: fastapi, pydantic, pydantic-settings
+typing-inspection==0.4.4
+
+# urllib3
+# Purpose: HTTP library with thread-safe connection pooling, file post, and more.
+# Dependency of: kubernetes, nab-index, requests
+urllib3==2.7.0
+
+# uuid-utils
+# Purpose: Fast, drop-in replacement for Python's uuid module, powered by Rust.
+# Dependency of: langchain-core, langsmith
+uuid-utils==1.0.0
+
+# uvicorn
+# Purpose: The lightning-fast ASGI server.
+# Dependency of: chromadb
+uvicorn==0.52.4
+
+# watchfiles
+# Purpose: Simple, modern and high performance file watching and code reload in python.
+# Dependency of: uvicorn
+watchfiles==1.2.0
+
+# websocket-client
+# Purpose: WebSocket client for Python with low level API options
+# Dependency of: kubernetes
+websocket-client==1.9.2
+
+# websockets
+# Purpose: An implementation of the WebSocket Protocol (RFC 6455 & 7692)
+# Dependency of: langsmith, uvicorn
+websockets==17.1
+
+# win32-setctime
+# Purpose: A small Python utility to set file creation time on Windows
+# Dependency of: loguru
+win32-setctime==1.2.0
+
+# xxhash
+# Purpose: Python binding for xxHash
+# Dependency of: langsmith
+xxhash==4.0.1
+
+# yarl
+# Purpose: Yet another URL library
+# Dependency of: aiohttp
+yarl==1.24.5
+
+# yt-dlp
+# Purpose: A feature-rich command-line audio/video downloader
+# Dependency of: Project / directly installed
+yt-dlp==2026.8.19
+
+# zstandard
+# Purpose: Zstandard bindings for Python
+# Dependency of: langsmith
+zstandard==0.25.0
+
+
+# pytz
+# Purpose: World timezone definitions, modern and historical
+# Dependency of: Project / directly installed
+pytz==2026.3.post1
