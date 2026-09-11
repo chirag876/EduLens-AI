@@ -49,13 +49,29 @@ def add_documents(
 
     try:
         collection = get_collection(collection_name)
-        collection.add(
-            documents=documents,
-            embeddings=embeddings,
-            metadatas=metadatas,
-            ids=ids,
-        )
-        return {'added_count': len(ids)}
+        BATCH_SIZE = 5000
+ 
+        total = len(ids)
+        
+        if total <= BATCH_SIZE:
+            collection.add(
+                documents=documents,
+                embeddings=embeddings,
+                metadatas=metadatas,
+                ids=ids,
+            )
+        else:
+            # Split into batches
+            for start in range(0, total, BATCH_SIZE):
+                end = min(start + BATCH_SIZE, total)
+                collection.add(
+                    documents=documents[start:end],
+                    embeddings=embeddings[start:end],
+                    metadatas=metadatas[start:end],
+                    ids=ids[start:end],
+                )
+ 
+        return {'added_count': total}
     except Exception as error:
         raise CustomHTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -154,5 +170,37 @@ def count_documents(collection_name: str) -> dict[str, Any]:
         raise CustomHTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f'{collection_name}: Failed to count documents — {str(error)}',
+            identifier=error_identifier.INTERNAL_SERVER_ERROR,
+        ) from error
+        
+def count_documents_by_filter(collection_name: str, where: dict) -> dict[str, Any]:
+    """
+    Count documents in a ChromaDB collection matching a metadata filter.
+    """
+    try:
+        collection = get_collection(collection_name)
+        results = collection.get(where=where, include=[]) # only want the ids not the complete document
+        return {'count': len(results['ids'])}
+    except Exception:
+        return {'count': 0}
+    
+def delete_documents_by_filter(collection_name: str, where: dict) -> dict[str, Any]:
+    """
+    Delete documents from ChromaDB by metadata filter.
+    """
+    try:
+        collection = get_collection(collection_name)
+        # Pehle IDs fetch karo filter se
+        results = collection.get(where=where, include=[])
+        ids = results['ids']
+        if not ids:
+            return {'deleted_count': 0}
+        # Phir un IDs ko delete karo
+        collection.delete(ids=ids)
+        return {'deleted_count': len(ids)}
+    except Exception as error:
+        raise CustomHTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'{collection_name}: Failed to delete by filter — {str(error)}',
             identifier=error_identifier.INTERNAL_SERVER_ERROR,
         ) from error

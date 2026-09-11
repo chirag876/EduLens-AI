@@ -74,7 +74,7 @@
 import uuid
 from io import BytesIO
 
-import fitz  # PyMuPDF
+import pymupdf as fitz # PyMuPDF
 import httpx
 from fastapi import status
 
@@ -101,7 +101,12 @@ async def fetch_pdf_bytes(url: str) -> bytes:
     """
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.get(url)
+            response = await client.get(url,
+                                        headers={
+                                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                                            'Accept': 'application/pdf,*/*',
+                                        },
+                                        follow_redirects=True,)
             if response.status_code != 200:
                 raise CustomHTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -130,7 +135,10 @@ def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
         str: Extracted raw text from all pages.
     """
     try:
-        pdf_document = fitz.open(stream=BytesIO(pdf_bytes), filetype='pdf')
+        # Store BytesIO(pdf_bytes) in a variable to ensure the stream remains alive while the PDF is being processed.
+        pdf_stream = BytesIO(pdf_bytes)
+        pdf_document = fitz.open(stream=pdf_stream, filetype='pdf')
+        total_pages = len(pdf_document)
         full_text = []
 
         for page_num in range(len(pdf_document)):
@@ -141,7 +149,7 @@ def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
 
         pdf_document.close()
         extracted = '\n\n'.join(full_text)
-        logger.debug(f'Extracted text from {len(pdf_document)} pages — {len(extracted)} chars')
+        logger.debug(f'Extracted text from {total_pages} pages — {len(extracted)} chars')
         return extracted
 
     except Exception as error:
@@ -165,6 +173,21 @@ async def ingest_pdf(url: str, title: str) -> dict:
         dict: Summary of ingestion with chunk count and document id.
     """
     logger.debug(f'Starting PDF ingestion: {title}')
+    
+    # Duplicate check — agar same title already ingested hai toh skip karo
+    existing = db.count_documents_by_filter(
+        collection_name=Collections.PDF_CHUNKS,
+        where={'title': title}
+    )
+    if existing['count'] > 0:
+        logger.debug(f'PDF already ingested: {title} — skipping')
+        return {
+            'title': title,
+            'url': url,
+            'total_chunks': existing['count'],
+            'source_type': SourceType.PDF,
+            'message': 'Already ingested — skipped duplicate',
+        }
 
     # Step 1: Fetch PDF bytes into memory
     pdf_bytes = await fetch_pdf_bytes(url)

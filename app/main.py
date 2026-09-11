@@ -21,6 +21,8 @@ from app.server.middlewares.exceptions import ExceptionHandlerMiddleware
 from app.server.middlewares.request_gzip import GzipRoute
 from app.server.utils import date_utils
 from app.server.utils.token_util import authorize_docs
+from app.server.routes.ingestion import router as INGESTION
+from app.server.routes.query import router as QUERY
 
 # NOTE: Routes will be imported and registered here as they are built
 # from app.server.routes.ingestion import router as INGESTION
@@ -41,8 +43,8 @@ GZIP_REQUEST_ROUTE = APIRouter(route_class=GzipRoute)
 # add routes
 app.include_router(GZIP_REQUEST_ROUTE)
 # NOTE: Routes will be added here as they are built
-# app.include_router(INGESTION, tags=['INGESTION'], prefix='/api/v1')
-# app.include_router(QUERY, tags=['QUERY'], prefix='/api/v1')
+app.include_router(INGESTION, tags=['INGESTION'], prefix='/api/v1')
+app.include_router(QUERY, tags=['QUERY'], prefix='/api/v1')
 
 # add exception handlers
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
