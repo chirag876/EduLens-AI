@@ -27,7 +27,7 @@ Step 7 — main.py
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------
-**Files that will not need to be changed** (common components):
+Files that will not need to be changed (common components):
 
 * `embeddings/embedder.py`
 * `processing/cleaner.py` (only a new cleaning function may be added)
