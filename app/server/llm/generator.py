@@ -88,7 +88,10 @@ from app.server.config import config
 from app.server.handler.error_handler import CustomHTTPException
 from app.server.logger.custom_logger import logger
 from app.server.static import error_identifier
+from app.server.static.enums import GradeLevel
+from typing import Optional
 from fastapi import status
+import templates as temp
 
 # Initialize Groq client once
 _groq_client = None
@@ -169,6 +172,19 @@ STUDENT QUESTION:
 ANSWER:"""
 
     return prompt
+
+
+# generator.py
+# def build_prompt(question: str, context: str,  grade_level: Optional[GradeLevel] = None) -> str:
+#     prompt = temp.load_prompt_template()
+#     return prompt.format(
+#         institution_name=config.INSTITUTION_NAME,
+#         language=config.CLIENT_LANGUAGE,
+#         tone=config.CLIENT_TONE,
+#         grade_level=grade_level.value if grade_level else "",
+#         context=context,
+#         question=question,
+#     )
 
 
 def generate_answer(question: str, chunks: list[dict], grade_level: str = None) -> dict:
