@@ -224,59 +224,73 @@ async def ingest_video(url: str, title: str) -> dict:
     """
     logger.debug(f'Starting video ingestion: {title}')
     audio_path = None
-
-    try:
-        # Step 1: Download audio only
-        audio_path = download_audio(url)
-
-        # Step 2: Transcribe audio to text
-        raw_transcript = transcribe_audio(audio_path)
-
-        # Step 3: Clean transcript
-        cleaned_transcript = clean_transcript_text(raw_transcript)
-
-        # Step 4: Chunk text
-        metadata = {
-            'source_type': SourceType.VIDEO,
-            'title': title,
-            'url': url,
-        }
-        chunks = chunk_text(cleaned_transcript, metadata)
-
-        if not chunks:
-            raise CustomHTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f'No chunks generated from video: {title}',
-                identifier=error_identifier.VIDEO_INGESTION_FAILED,
-            )
-
-        # Step 5: Generate embeddings
-        texts = [chunk['text'] for chunk in chunks]
-        embeddings = generate_embeddings(texts)
-
-        # Step 6: Prepare data for ChromaDB
-        ids = [str(uuid.uuid4()) for _ in chunks]
-        metadatas = [chunk['metadata'] for chunk in chunks]
-
-        # Step 7: Store in ChromaDB
-        db.add_documents(
-            collection_name=Collections.VIDEO_CHUNKS,
-            documents=texts,
-            embeddings=embeddings,
-            metadatas=metadatas,
-            ids=ids,
-        )
-
-        logger.debug(f'Video ingestion complete: {title} — {len(chunks)} chunks stored')
-
+    existing = db.count_documents_by_filter(
+        collection_name=Collections.VIDEO_CHUNKS,
+        where={'title': title}
+    )
+    if existing['count'] > 0:
+        logger.debug(f'Video already ingested: {title} — skipping')
         return {
             'title': title,
             'url': url,
-            'total_chunks': len(chunks),
+            'total_chunks': existing['count'],
             'source_type': SourceType.VIDEO,
+            'message': 'Already ingested — skipped duplicate',
         }
+    else:
 
-    finally:
-        # Always delete temp audio file even if ingestion fails
-        if audio_path:
-            delete_audio_file(audio_path)
+        try:
+            # Step 1: Download audio only
+            audio_path = download_audio(url)
+
+            # Step 2: Transcribe audio to text
+            raw_transcript = transcribe_audio(audio_path)
+
+            # Step 3: Clean transcript
+            cleaned_transcript = clean_transcript_text(raw_transcript)
+
+            # Step 4: Chunk text
+            metadata = {
+                'source_type': SourceType.VIDEO,
+                'title': title,
+                'url': url,
+            }
+            chunks = chunk_text(cleaned_transcript, metadata)
+
+            if not chunks:
+                raise CustomHTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=f'No chunks generated from video: {title}',
+                    identifier=error_identifier.VIDEO_INGESTION_FAILED,
+                )
+
+            # Step 5: Generate embeddings
+            texts = [chunk['text'] for chunk in chunks]
+            embeddings = generate_embeddings(texts)
+
+            # Step 6: Prepare data for ChromaDB
+            ids = [str(uuid.uuid4()) for _ in chunks]
+            metadatas = [chunk['metadata'] for chunk in chunks]
+
+            # Step 7: Store in ChromaDB
+            db.add_documents(
+                collection_name=Collections.VIDEO_CHUNKS,
+                documents=texts,
+                embeddings=embeddings,
+                metadatas=metadatas,
+                ids=ids,
+            )
+
+            logger.debug(f'Video ingestion complete: {title} — {len(chunks)} chunks stored')
+
+            return {
+                'title': title,
+                'url': url,
+                'total_chunks': len(chunks),
+                'source_type': SourceType.VIDEO,
+            }
+
+        finally:
+            # Always delete temp audio file even if ingestion fails
+            if audio_path:
+                delete_audio_file(audio_path)

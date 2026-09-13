@@ -1,7 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter
-
+from app.server.database import core_data as db
 from app.server.ingestion.pdf_ingestion import ingest_pdf
 from app.server.ingestion.video_ingestion import ingest_video
 from app.server.models.ingestion_model import IngestionResponse, PDFIngestionRequest, VideoIngestionRequest
@@ -23,9 +23,22 @@ async def ingest_video_route(params: VideoIngestionRequest) -> dict[str, Any]:
 
 @router.delete('/ingest/pdf', summary='Delete an ingested PDF from curriculum')
 async def delete_pdf_route(title: str) -> dict[str, Any]:
-    from app.server.database import core_data as db
+
     result = db.delete_documents_by_filter(
         collection_name=Collections.PDF_CHUNKS,
+        where={'title': title}
+    )
+    return {
+        'title': title,
+        'deleted_chunks': result['deleted_count'],
+        'message': 'Deleted successfully'
+    }
+
+
+@router.delete('/ingest/video', summary='Delete an ingested video from curriculum')
+async def delete_video_route(title: str) -> dict[str, Any]:
+    result = db.delete_documents_by_filter(
+        collection_name=Collections.VIDEO_CHUNKS,
         where={'title': title}
     )
     return {
