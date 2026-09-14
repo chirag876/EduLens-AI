@@ -99,6 +99,10 @@ async def fetch_pdf_bytes(url: str) -> bytes:
     Returns:
         bytes: PDF file content as bytes.
     """
+    if 'drive.google.com/file/d/' in url:
+        file_id = url.split('/file/d/')[1].split('/')[0]
+        url = f'https://drive.google.com/uc?export=download&id={file_id}'
+        logger.debug(f'Google Drive URL converted: {url}')
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.get(url,

@@ -91,7 +91,7 @@ from app.server.static import error_identifier
 from app.server.static.enums import GradeLevel
 from typing import Optional
 from fastapi import status
-import templates as temp
+import app.server.templates as temp
 
 # Initialize Groq client once
 _groq_client = None
