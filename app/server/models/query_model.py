@@ -60,7 +60,7 @@ class QueryRequest(BaseModel):
         if not v or not v.strip():
             raise ValueError('question cannot be empty')
         if len(v.strip()) < 5:
-            raise ValueError('question length should be minimum 5 characters')
+            raise ValueError('question is too short')
         return v.strip()
 
 
@@ -68,6 +68,8 @@ class SourceReference(BaseModel):
     title: str
     type: str
     url: str
+    pages_cited: list[int] = []       # page numbers from which answer was retrieved
+    chunk_indices: list[int] = []     # internal chunk indices (for debugging)
 
 
 class QueryResponse(BaseModel):

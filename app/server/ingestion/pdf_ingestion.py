@@ -74,7 +74,7 @@
 import uuid
 from io import BytesIO
 
-import pymupdf as fitz # PyMuPDF
+import pymupdf as fitz  # PyMuPDF
 import httpx
 from fastapi import status
 
@@ -145,16 +145,20 @@ def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
         total_pages = len(pdf_document)
         full_text = []
 
-        for page_num in range(len(pdf_document)):
+        for page_num in range(total_pages):
             page = pdf_document[page_num]
             text = page.get_text()
             if text.strip():
-                full_text.append(text)
+                full_text.append({
+                    'text': text,
+                    'page_number': page_num + 1,
+                })
 
         pdf_document.close()
-        extracted = '\n\n'.join(full_text)
-        logger.debug(f'Extracted text from {total_pages} pages — {len(extracted)} chars')
-        return extracted
+        # extracted = '\n\n'.join(full_text)
+        # logger.debug(f'Extracted text from {total_pages} pages — {len(extracted)} chars')
+        logger.debug(f'Extracted text from {total_pages} pages — {len(full_text)} pages with content')
+        return full_text
 
     except Exception as error:
         raise CustomHTTPException(
@@ -177,7 +181,7 @@ async def ingest_pdf(url: str, title: str) -> dict:
         dict: Summary of ingestion with chunk count and document id.
     """
     logger.debug(f'Starting PDF ingestion: {title}')
-    
+
     # Duplicate check — agar same title already ingested hai toh skip karo
     existing = db.count_documents_by_filter(
         collection_name=Collections.PDF_CHUNKS,
@@ -190,27 +194,53 @@ async def ingest_pdf(url: str, title: str) -> dict:
             'url': url,
             'total_chunks': existing['count'],
             'source_type': SourceType.PDF,
-            'message': 'Already ingested — skipped duplicate',
+            'message': 'Already ingested : skipped duplicate',
         }
 
     # Step 1: Fetch PDF bytes into memory
     pdf_bytes = await fetch_pdf_bytes(url)
 
-    # Step 2: Extract raw text
-    raw_text = extract_text_from_pdf_bytes(pdf_bytes)
+    # Step 2: Extract text per page (with page numbers preserved)
+    pages = extract_text_from_pdf_bytes(pdf_bytes)
 
-    # Step 3: Clean text
-    cleaned_text = clean_pdf_text(raw_text)
+    if not pages:
+        raise CustomHTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f'No text content found in PDF: {title}',
+            identifier=error_identifier.PDF_INGESTION_FAILED,
+        )
 
-    # Step 4: Chunk text
-    metadata = {
-        'source_type': SourceType.PDF,
-        'title': title,
-        'url': url,
-    }
-    chunks = chunk_text(cleaned_text, metadata)
+    # Step 3: Clean + Chunk each page separately (page number preserved per chunk)
+    all_chunks = []
+    global_chunk_idx = 0  # Track overall chunk index
+    # Ensure source_type string format me ho (Enum object issue prevent karne ke liye)
+    src_type_str = SourceType.PDF.value if hasattr(SourceType.PDF, 'value') else str(SourceType.PDF)
+    for page_data in pages:
+        cleaned_text = clean_pdf_text(page_data['text'])
+        if not cleaned_text.strip():
+            continue
 
-    if not chunks:
+        page_chunks = chunk_text(
+            text=cleaned_text,
+            metadata={},
+        )
+        # Explicitly metadata override/inject karo har chunk ke andar
+        for chunk in page_chunks:
+            # Agar chunk dictionary object hai
+            if isinstance(chunk, dict):
+                if 'metadata' not in chunk or not isinstance(chunk['metadata'], dict):
+                    chunk['metadata'] = {}
+
+                chunk['metadata']['source_type'] = src_type_str
+                chunk['metadata']['title'] = title
+                chunk['metadata']['url'] = url
+                chunk['metadata']['page_number'] = int(page_data['page_number'])
+                chunk['metadata']['chunk_index'] = int(global_chunk_idx)
+
+                all_chunks.append(chunk)
+            global_chunk_idx += 1
+
+    if not all_chunks:
         raise CustomHTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f'No chunks generated from PDF: {title}',
@@ -218,12 +248,15 @@ async def ingest_pdf(url: str, title: str) -> dict:
         )
 
     # Step 5: Generate embeddings
-    texts = [chunk['text'] for chunk in chunks]
+    texts = [chunk['text'] for chunk in all_chunks]
     embeddings = generate_embeddings(texts)
 
     # Step 6: Prepare data for ChromaDB
-    ids = [str(uuid.uuid4()) for _ in chunks]
-    metadatas = [chunk['metadata'] for chunk in chunks]
+    ids = [str(uuid.uuid4()) for _ in all_chunks]
+    metadatas = [chunk['metadata'] for chunk in all_chunks]
+
+    # Debug log check karne ke liye ki ingestion ke waqt metadata kaisa dikh raha hai
+    logger.debug(f"Sample ingested chunk metadata: {metadatas[0] if metadatas else 'None'}")
 
     # Step 7: Store in ChromaDB
     db.add_documents(
@@ -234,11 +267,12 @@ async def ingest_pdf(url: str, title: str) -> dict:
         ids=ids,
     )
 
-    logger.debug(f'PDF ingestion complete: {title} — {len(chunks)} chunks stored')
+    logger.debug(f'PDF ingestion complete: {title} — {len(all_chunks)} chunks stored')
 
     return {
         'title': title,
         'url': url,
-        'total_chunks': len(chunks),
-        'source_type': SourceType.PDF,
+        'total_chunks': len(all_chunks),
+        'source_type': src_type_str,
+        'message': 'Ingestion completed successfully'
     }

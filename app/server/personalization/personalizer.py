@@ -136,8 +136,10 @@ def format_sources(sources: list[dict]) -> list[dict]:
     for source in sources:
         formatted.append({
             'title': source.get('title', 'Unknown Source'),
-            'type': source.get('source_type', 'unknown').upper(),
+            'type': source.get('type', 'UNKNOWN'),
             'url': source.get('url', ''),
+            'pages_cited': source.get('pages_cited', []),
+            'chunk_indices': source.get('chunk_indices', []),
         })
     return formatted
 

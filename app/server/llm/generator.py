@@ -186,6 +186,71 @@ ANSWER:"""
 #         question=question,
 #     )
 
+# llm/generator.py
+
+def build_sources(chunks: list[dict]) -> list[dict]:
+    """
+    Build a deduplicated list of sources with full citation details.
+    Groups chunks by URL and collects all unique page numbers per source.
+ 
+    Args:
+        chunks (list[dict]): Retrieved chunks from ChromaDB.
+ 
+    Returns:
+        list[dict]: List of sources with title, type, url, pages cited.
+    """
+    sources_map = {}
+
+    for chunk in chunks:
+        # Debug print to verify ChromaDB retrieval
+        metadata = chunk.get('metadata', {}) or {}
+        
+        url = metadata.get('url', '')
+        title = metadata.get('title', 'Unknown')
+        
+        # Source type extraction handling
+        source_type = metadata.get('source_type', 'PDF')
+        if hasattr(source_type, 'value'):
+            source_type = source_type.value
+            
+        page_number = metadata.get('page_number', None)
+        chunk_index = metadata.get('chunk_index', None)
+
+        if url not in sources_map:
+            sources_map[url] = {
+                'title': title,
+                'type': str(source_type).upper(),
+                'url': url,
+                'pages_cited': [],
+                'chunk_indices': [],
+            }
+
+        # Page numbers safely append
+        if page_number is not None:
+            try:
+                p_num = int(float(str(page_number)))
+                if p_num not in sources_map[url]['pages_cited']:
+                    sources_map[url]['pages_cited'].append(p_num)
+            except (ValueError, TypeError):
+                pass
+
+        # Chunk indices safely append
+        if chunk_index is not None:
+            try:
+                c_idx = int(chunk_index)
+                if c_idx not in sources_map[url]['chunk_indices']:
+                    sources_map[url]['chunk_indices'].append(c_idx)
+            except (ValueError, TypeError):
+                pass
+
+    # Final sorting
+    sources = []
+    for source in sources_map.values():
+        source['pages_cited'] = sorted(source['pages_cited'])
+        source['chunk_indices'] = sorted(source['chunk_indices'])
+        sources.append(source)
+
+    return sources
 
 def generate_answer(question: str, chunks: list[dict], grade_level: str = None) -> dict:
     """
@@ -237,18 +302,18 @@ def generate_answer(question: str, chunks: list[dict], grade_level: str = None) 
         logger.debug('Answer generated successfully')
 
         # Step 4: Build sources list
-        sources = []
-        seen_urls = set()
-        for chunk in chunks:
-            url = chunk['metadata'].get('url', '')
-            if url and url not in seen_urls:
-                seen_urls.add(url)
-                sources.append({
-                    'title': chunk['metadata'].get('title', 'Unknown'),
-                    'source_type': chunk['metadata'].get('source_type', 'unknown'),
-                    'url': url,
-                })
-
+        # sources = []
+        # seen_urls = set()
+        # for chunk in chunks:
+        #     url = chunk['metadata'].get('url', '')
+        #     if url and url not in seen_urls:
+        #         seen_urls.add(url)
+        #         sources.append({
+        #             'title': chunk['metadata'].get('title', 'Unknown'),
+        #             'source_type': chunk['metadata'].get('source_type', 'unknown'),
+        #             'url': url,
+        #         })
+        sources = build_sources(chunks)
         return {
             'answer': answer,
             'sources': sources,
