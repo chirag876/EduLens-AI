@@ -6,14 +6,7 @@ from datetime import date, datetime
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
-        # if isinstance(o, np.integer):
-        #     return int(o)
-        # elif isinstance(o, np.floating):
-        #     return float(o)
-        # if isinstance(o, np.ndarray):
-        #     return o.tolist()
-        # if isinstance(o, df):
-        #     return o.to_json(orient='table')
+        
         return o.isoformat() if isinstance(o, (date, datetime)) else super().default(o)
 
 
@@ -24,7 +17,6 @@ def json_decoder(obj):
 
 
 # Encoder function
-
 
 def json_dumps(obj):
     return json.dumps(obj, cls=JSONEncoder)

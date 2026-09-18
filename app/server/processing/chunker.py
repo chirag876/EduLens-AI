@@ -8,52 +8,6 @@
 #
 # The same chunking logic is used for both PDF content and video transcripts
 # to maintain a consistent processing pipeline across different data sources.
-#
-# Key Responsibilities:
-#
-# 1. Text Chunking
-#    - Splits large PDF text and video transcript content into smaller chunks.
-#    - Smaller chunks make the content easier to embed, store, retrieve, and
-#      provide as context to the LLM.
-#
-# 2. Configurable Chunk Size
-#    - CHUNK_SIZE defines the maximum number of characters considered for
-#      each chunk.
-#    - The current configuration uses 500 characters per chunk.
-#
-# 3. Chunk Overlap
-#    - CHUNK_OVERLAP keeps a portion of the previous chunk in the next chunk.
-#    - The current configuration uses a 50-character overlap.
-#    - This helps preserve context when important information lies near a
-#      chunk boundary.
-#
-# 4. Recursive Smart Splitting
-#    - Uses RecursiveCharacterTextSplitter from langchain-text-splitters.
-#    - The splitter attempts to preserve meaningful text boundaries instead
-#      of blindly cutting the text at a fixed character position.
-#    - Splitting is attempted in the following order:
-#        1. Paragraph breaks
-#        2. Line breaks
-#        3. Sentence boundaries
-#        4. Word boundaries
-#        5. Individual characters as a final fallback
-#
-# 5. Metadata Preservation
-#    - Metadata received with the original text is attached to every chunk.
-#    - This allows downstream components to identify where a retrieved chunk
-#      originated from, such as a PDF or video transcript.
-#
-# 6. Chunk Indexing
-#    - Each generated chunk receives a sequential chunk_index.
-#    - The index helps identify the original order of chunks within the
-#      source content.
-#
-# 7. Input Validation and Error Handling
-#    - Empty or whitespace-only text is rejected before processing.
-#    - Chunking failures are converted into application-level
-#      CustomHTTPException errors for consistent API error handling.
-#
-# =============================================================================
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 

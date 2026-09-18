@@ -2,77 +2,7 @@
 
 This file contains the next implementation items for the EduLens AI RAG system.
 
-## 1. Citation
-
-### Goal
-Return source references that identify the specific page and chunk from which retrieved content came, instead of only returning the overall document URL.
-
-### Implementation
-
-#### `ingestion/pdf_ingestion.py`
-Add page number metadata while extracting PDF pages:
-
-```python
-for page_num in range(total_pages):
-    page = pdf_document[page_num]
-    text = page.get_text()
-
-    if text.strip():
-        full_text.append({
-            "text": text,
-            "page_number": page_num + 1,
-        })
-```
-
-Carry the page number into chunk metadata:
-
-```python
-chunks_with_pages = []
-
-for page_data in pages:
-    page_chunks = chunk_text(
-        page_data["text"],
-        metadata={
-            "source_type": SourceType.PDF,
-            "title": title,
-            "url": url,
-            "page_number": page_data["page_number"],
-        },
-    )
-
-    chunks_with_pages.extend(page_chunks)
-```
-
-#### `models/query_model.py`
-Extend `SourceReference`:
-
-```python
-class SourceReference(BaseModel):
-    title: str
-    type: str
-    url: str
-    page_number: Optional[int] = None
-    chunk_index: Optional[int] = None
-```
-
-#### `llm/generator.py`
-Include page and chunk metadata in returned sources:
-
-```python
-sources.append({
-    "title": chunk["metadata"].get("title", "Unknown"),
-    "source_type": chunk["metadata"].get("source_type", "unknown"),
-    "url": chunk["metadata"].get("url", ""),
-    "page_number": chunk["metadata"].get("page_number"),
-    "chunk_index": chunk["metadata"].get("chunk_index"),
-})
-```
-
-**Important:** Existing ChromaDB data must be re-ingested after adding page metadata because old chunks do not contain `page_number`.
-
----
-
-## 2. Confidence Score
+## 1. Confidence Score
 
 ### Goal
 Calculate an internal RAG response confidence score based on retrieval relevance, answer grounding, and answer completeness.
@@ -130,7 +60,7 @@ In `routes/query.py`, calculate the score after answer generation/moderation and
 
 ---
 
-## 3. Prompt Caching
+## 2. Prompt Caching
 
 ### Current approach
 

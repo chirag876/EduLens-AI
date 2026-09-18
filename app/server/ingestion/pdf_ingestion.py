@@ -8,69 +8,7 @@
 #
 # The PDF is processed entirely in memory. The implementation does not save
 # the PDF to disk during ingestion.
-#
-# Processing Flow:
-#
-#     PDF URL
-#        │
-#        ▼
-#     Fetch PDF Bytes
-#        │
-#        ▼
-#     Extract Text using PyMuPDF
-#        │
-#        ▼
-#     Clean Extracted Text
-#        │
-#        ▼
-#     Split Text into Chunks
-#        │
-#        ▼
-#     Generate Embeddings
-#        │
-#        ▼
-#     Store Chunks + Embeddings + Metadata in ChromaDB
-#
-# Key Responsibilities:
-#
-# 1. In-Memory PDF Fetching
-#    - Fetches the PDF content directly from the provided URL using HTTPX.
-#    - The response content is kept in memory as bytes.
-#    - The PDF is not written to disk during the ingestion process.
-#
-# 2. PDF Text Extraction
-#    - Uses PyMuPDF (fitz) to open the PDF from its in-memory byte content.
-#    - Extracts text from every page that contains meaningful text.
-#    - Combines the extracted page content into a single text string.
-#
-# 3. Text Cleaning
-#    - Passes the extracted raw text through the PDF-specific cleaning
-#      pipeline before further processing.
-#    - Removes common extraction artifacts and unnecessary text noise.
-#
-# 4. Text Chunking
-#    - Splits the cleaned PDF text into smaller, overlapping chunks.
-#    - Attaches source metadata such as source type, title, URL, and chunk index
-#      to every generated chunk.
-#
-# 5. Embedding Generation
-#    - Converts every text chunk into a numerical embedding vector using the
-#      shared embedding model.
-#    - These embeddings allow the document chunks to be searched later using
-#      semantic similarity.
-#
-# 6. ChromaDB Storage
-#    - Generates a unique UUID for every chunk.
-#    - Stores the chunk text, generated embedding, and associated metadata in
-#      the configured PDF ChromaDB collection.
-#
-# 7. Pipeline Validation and Error Handling
-#    - Validates HTTP responses and generated chunks before continuing through
-#      the pipeline.
-#    - Converts ingestion, fetching, extraction, and storage failures into
-#      application-level CustomHTTPException errors.
-#
-# =============================================================================
+
 import uuid
 from io import BytesIO
 

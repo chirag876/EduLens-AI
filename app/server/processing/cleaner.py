@@ -8,40 +8,6 @@
 # Raw extracted content can contain unnecessary formatting, technical
 # artifacts, or conversational noise. Cleaning this content before chunking
 # and embedding helps produce cleaner and more meaningful AI representations.
-#
-# Key Responsibilities:
-#
-# 1. PDF Text Cleaning
-#    - Cleans raw text extracted from PDF documents.
-#    - Removes common PDF-related artifacts such as page numbers, URLs,
-#      excessive whitespace, and non-printable characters.
-#
-# 2. Video Transcript Cleaning
-#    - Cleans raw text generated from video transcripts.
-#    - Removes timestamps, speaker labels, filler words, URLs, and unnecessary
-#      whitespace from the transcript.
-#
-# 3. Source-Specific Cleaning
-#    - PDF and video transcript content have different types of noise.
-#    - Separate cleaning functions are provided so that each source can be
-#      processed according to its specific requirements.
-#
-# 4. Text Normalization
-#    - Removes unnecessary spaces and tabs.
-#    - Reduces excessive newline characters.
-#    - Strips leading and trailing whitespace from individual lines.
-#    - Removes non-printable and control characters.
-#
-# 5. Input Validation
-#    - Rejects empty or whitespace-only input before performing any cleaning.
-#    - This prevents invalid content from entering the processing pipeline.
-#
-# 6. Centralized Error Handling
-#    - Cleaning failures are converted into application-level
-#      CustomHTTPException errors.
-#    - This keeps error handling consistent across the application.
-#
-# =============================================================================
 
 import re
 

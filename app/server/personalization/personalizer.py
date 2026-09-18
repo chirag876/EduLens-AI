@@ -10,69 +10,6 @@
 #
 # The personalization layer sits after moderation and prepares the final
 # response that will be returned to the student.
-#
-# Processing Flow:
-#
-#     Moderated Answer
-#          │
-#          ▼
-#     Determine Grade Level
-#          │
-#          ▼
-#     Apply Grade-Level Configuration
-#          │
-#          ▼
-#     Format Source References
-#          │
-#          ▼
-#     Build Final Response
-#          │
-#          ▼
-#     Student-Facing Response
-#
-# Key Responsibilities:
-#
-# 1. Grade-Level Configuration
-#    - Defines response instructions for Primary, Middle School, High School,
-#      and College students.
-#    - Each grade level has its own language style and configured maximum
-#      response length.
-#
-# 2. Grade-Level Personalization
-#    - Identifies the student's requested grade level when provided.
-#    - Provides the corresponding grade-level configuration to the final
-#      response pipeline.
-#    - Primary-level responses are designed around simple language and
-#      everyday examples, while College-level responses allow more advanced
-#      academic and technical terminology.
-#
-# 3. Source Formatting
-#    - Converts raw source references returned by the LLM generation layer
-#      into a consistent structure for the final API response.
-#    - Normalizes source type values and provides fallback values for missing
-#      source information.
-#
-# 4. Final Response Construction
-#    - Combines the moderated answer, grade-level label, and formatted sources
-#      into a single structured response.
-#    - Also provides the total number of unique formatted sources.
-#
-# 5. Grade-Level Validation
-#    - Validates the provided grade level against the supported grade-level
-#      configurations.
-#    - Invalid grade levels result in a controlled application-level error.
-#
-# 6. Optional Grade Level
-#    - Grade-level personalization is optional.
-#    - When no grade level is provided, the answer is returned as a general
-#      response without a grade-specific label.
-#
-# 7. Input Validation and Error Handling
-#    - Rejects empty or whitespace-only answers before personalization.
-#    - Converts unexpected personalization failures into application-level
-#      CustomHTTPException errors for consistent API error handling.
-#
-# =============================================================================
 
 from app.server.handler.error_handler import CustomHTTPException
 from app.server.logger.custom_logger import logger
