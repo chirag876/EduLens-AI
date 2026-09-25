@@ -20,6 +20,11 @@ aiohttp==3.14.3
 # Dependency of: aiohttp
 aiosignal==1.4.0
 
+# amqp
+# Purpose: Low-level AMQP client for Python (fork of amqplib).
+# Dependency of: kombu
+amqp==5.4.0
+
 # annotated-doc
 # Purpose: Document parameters, class attributes, return types, and variables inline, with Annotated.
 # Dependency of: fastapi, typer
@@ -50,10 +55,20 @@ av==18.1.0
 # Dependency of: chromadb
 bcrypt==5.0.0
 
+# billiard
+# Purpose: Python multiprocessing fork with improvements and bugfixes
+# Dependency of: celery
+billiard==4.3.0
+
 # build
 # Purpose: A simple, correct Python build frontend
 # Dependency of: chromadb, nab-project
-build==1.6.1
+build==1.6.0
+
+# celery
+# Purpose: Distributed Task Queue.
+# Dependency of: Project / directly installed
+celery==5.6.3
 
 # certifi
 # Purpose: Python package for providing Mozilla's CA Bundle.
@@ -77,8 +92,23 @@ chromadb==1.5.9
 
 # click
 # Purpose: Composable command line interface toolkit
-# Dependency of: huggingface-hub, uvicorn
+# Dependency of: celery, click-didyoumean, click-plugins, click-repl, huggingface-hub, uvicorn
 click==8.5.0
+
+# click-didyoumean
+# Purpose: Enables git-like *did-you-mean* feature in click
+# Dependency of: celery
+click-didyoumean==0.3.1
+
+# click-plugins
+# Purpose: An extension module for click to enable registering CLI commands via setuptools entry-points.
+# Dependency of: celery
+click-plugins==1.1.1.2
+
+# click-repl
+# Purpose: REPL plugin for Click
+# Dependency of: celery
+click-repl==0.4.0
 
 # cloudpickle
 # Purpose: Pickler class to extend the standard pickle.Pickler functionality
@@ -245,6 +275,11 @@ jsonschema==4.26.0
 # Dependency of: jsonschema
 jsonschema-specifications==2025.9.1
 
+# kombu
+# Purpose: Messaging library for Python.
+# Dependency of: celery
+kombu==5.6.2
+
 # kubernetes
 # Purpose: Kubernetes python client
 # Dependency of: chromadb
@@ -298,7 +333,7 @@ mmh3==5.3.0
 # mpmath
 # Purpose: Python library for arbitrary-precision floating-point arithmetic
 # Dependency of: sympy
-mpmath==1.4.1
+mpmath==1.3.0
 
 # multidict
 # Purpose: multidict implementation
@@ -402,7 +437,7 @@ overrides==7.7.0
 
 # packaging
 # Purpose: Core utilities for Python packages
-# Dependency of: build, huggingface-hub, langchain-core, langsmith, nab-index, nab-project, onnxruntime, transformers
+# Dependency of: build, huggingface-hub, kombu, langchain-core, langsmith, nab-index, nab-project, onnxruntime, transformers
 packaging==26.3
 
 # passlib
@@ -413,12 +448,17 @@ passlib==1.7.4
 # pip
 # Purpose: The PyPA recommended tool for installing Python packages.
 # Dependency of: Project / directly installed
-pip==26.2.1
+pip==24.3.1
 
 # pipdeptree
 # Purpose: Command line utility to show dependency tree of packages.
 # Dependency of: Project / directly installed
 pipdeptree==4.2.5
+
+# prompt_toolkit
+# Purpose: Library for building powerful interactive command lines in Python
+# Dependency of: click-repl
+prompt_toolkit==3.0.53
 
 # propcache
 # Purpose: Accelerated property cache
@@ -453,7 +493,7 @@ pydantic==2.13.5
 # pydantic_core
 # Purpose: Core functionality for Pydantic validation and serialization
 # Dependency of: pydantic
-pydantic_core==2.49.0
+pydantic_core==2.46.5
 
 # pydantic-settings
 # Purpose: Settings management using Pydantic
@@ -482,7 +522,7 @@ pyproject-hooks==1.2.0
 
 # python-dateutil
 # Purpose: Extensions to the standard Python datetime module
-# Dependency of: kubernetes
+# Dependency of: celery, kubernetes
 python-dateutil==2.9.0.post0
 
 # python-dotenv
@@ -500,10 +540,20 @@ python-jose==3.5.0
 # Dependency of: Project / directly installed
 python-multipart==0.0.32
 
+# pytz
+# Purpose: World timezone definitions, modern and historical
+# Dependency of: Project / directly installed
+pytz==2026.3.post1
+
 # PyYAML
 # Purpose: YAML parser and emitter for Python
 # Dependency of: chromadb, ctranslate2, huggingface-hub, kubernetes, langchain-core, transformers, uvicorn
 PyYAML==6.0.3
+
+# redis
+# Purpose: Python client for Redis database and key-value store
+# Dependency of: Project / directly installed
+redis==6.4.0
 
 # referencing
 # Purpose: JSON Referencing + Python
@@ -647,13 +697,23 @@ typer==0.27.2
 
 # typing-extensions
 # Purpose: Backported and Experimental Type Hints for Python 3.9+
-# Dependency of: anyio, chromadb, fastapi, groq, grpcio, huggingface-hub, langchain-core, langchain-protocol, langsmith, nab, nab-index, nab-project, nab-provider, opentelemetry-api, opentelemetry-exporter-otlp-proto-grpc, opentelemetry-sdk, opentelemetry-semantic-conventions, pydantic, pydantic-core, sentence-transformers, torch, typing-inspection
+# Dependency of: anyio, chromadb, click-repl, fastapi, groq, grpcio, huggingface-hub, langchain-core, langchain-protocol, langsmith, nab, nab-index, nab-project, nab-provider, opentelemetry-api, opentelemetry-exporter-otlp-proto-grpc, opentelemetry-sdk, opentelemetry-semantic-conventions, pydantic, pydantic-core, sentence-transformers, torch, typing-inspection
 typing-extensions==4.16.0
 
 # typing-inspection
 # Purpose: Runtime typing introspection tools
 # Dependency of: fastapi, pydantic, pydantic-settings
 typing-inspection==0.4.4
+
+# tzdata
+# Purpose: Provider of IANA time zone data
+# Dependency of: kombu, tzlocal
+tzdata==2026.4
+
+# tzlocal
+# Purpose: tzinfo object for the local timezone
+# Dependency of: celery
+tzlocal==5.4.4
 
 # urllib3
 # Purpose: HTTP library with thread-safe connection pooling, file post, and more.
@@ -663,17 +723,27 @@ urllib3==2.7.0
 # uuid-utils
 # Purpose: Fast, drop-in replacement for Python's uuid module, powered by Rust.
 # Dependency of: langchain-core, langsmith
-uuid-utils==1.0.0
+uuid-utils==0.17.1
 
 # uvicorn
 # Purpose: The lightning-fast ASGI server.
 # Dependency of: chromadb
 uvicorn==0.52.4
 
+# vine
+# Purpose: Python promises.
+# Dependency of: amqp, celery, kombu
+vine==5.1.0
+
 # watchfiles
 # Purpose: Simple, modern and high performance file watching and code reload in python.
 # Dependency of: uvicorn
 watchfiles==1.2.0
+
+# wcwidth
+# Purpose: Measures the displayed width of unicode strings in a terminal
+# Dependency of: prompt-toolkit
+wcwidth==0.9.1
 
 # websocket-client
 # Purpose: WebSocket client for Python with low level API options
@@ -709,9 +779,3 @@ yt-dlp==2026.8.19
 # Purpose: Zstandard bindings for Python
 # Dependency of: langsmith
 zstandard==0.25.0
-
-
-# pytz
-# Purpose: World timezone definitions, modern and historical
-# Dependency of: Project / directly installed
-pytz==2026.3.post1

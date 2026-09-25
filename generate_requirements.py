@@ -154,10 +154,7 @@ def main():
             package
         )
 
-        package_version = info.get(
-            "version",
-            get_package_version(package)
-        )
+        package_version = get_package_version(package)
 
         purpose = (
             info.get("summary")
