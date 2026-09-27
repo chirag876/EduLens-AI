@@ -190,12 +190,12 @@ def delete_documents_by_filter(collection_name: str, where: dict) -> dict[str, A
     """
     try:
         collection = get_collection(collection_name)
-        # Pehle IDs fetch karo filter se
+
         results = collection.get(where=where, include=[])
         ids = results['ids']
         if not ids:
             return {'deleted_count': 0}
-        # Phir un IDs ko delete karo
+
         collection.delete(ids=ids)
         return {'deleted_count': len(ids)}
     except Exception as error:

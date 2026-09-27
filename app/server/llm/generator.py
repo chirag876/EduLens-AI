@@ -64,43 +64,6 @@ def build_context(chunks: list[dict]) -> str:
     return '\n\n---\n\n'.join(context_parts)
 
 
-# def build_prompt(question: str, context: str, grade_level: str = None) -> str:
-#     """
-#     Build the prompt for the LLM using the question and retrieved context.
-
-#     Args:
-#         question (str): The student's question.
-#         context (str): Retrieved curriculum context.
-#         grade_level (str, optional): Student's grade level for personalization.
-
-#     Returns:
-#         str: The formatted prompt.
-#     """
-#     grade_instruction = ''
-#     if grade_level:
-#         grade_instruction = f'The student is at {grade_level} level. Adjust your language and complexity accordingly.\n'
-
-#     prompt = f"""You are an educational AI assistant. Your job is to answer student questions 
-# strictly based on the curriculum content provided below. 
-
-# {grade_instruction}
-# IMPORTANT RULES:
-# - Only use information from the provided curriculum context.
-# - If the answer is not in the context, say: "I could not find this in the curriculum. Please refer to your teacher."
-# - Be clear, concise, and educational in your response.
-# - Do not make up information.
-
-# CURRICULUM CONTEXT:
-# {context}
-
-# STUDENT QUESTION:
-# {question}
-
-# ANSWER:"""
-
-#     return prompt
-
-
 def build_prompt(question: str, context: str,  grade_level: Optional[GradeLevel] = None) -> str:
     prompt = temp.load_prompt_template()
     return prompt.format(
