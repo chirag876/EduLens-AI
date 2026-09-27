@@ -64,56 +64,53 @@ def build_context(chunks: list[dict]) -> str:
     return '\n\n---\n\n'.join(context_parts)
 
 
-def build_prompt(question: str, context: str, grade_level: str = None) -> str:
-    """
-    Build the prompt for the LLM using the question and retrieved context.
+# def build_prompt(question: str, context: str, grade_level: str = None) -> str:
+#     """
+#     Build the prompt for the LLM using the question and retrieved context.
 
-    Args:
-        question (str): The student's question.
-        context (str): Retrieved curriculum context.
-        grade_level (str, optional): Student's grade level for personalization.
+#     Args:
+#         question (str): The student's question.
+#         context (str): Retrieved curriculum context.
+#         grade_level (str, optional): Student's grade level for personalization.
 
-    Returns:
-        str: The formatted prompt.
-    """
-    grade_instruction = ''
-    if grade_level:
-        grade_instruction = f'The student is at {grade_level} level. Adjust your language and complexity accordingly.\n'
+#     Returns:
+#         str: The formatted prompt.
+#     """
+#     grade_instruction = ''
+#     if grade_level:
+#         grade_instruction = f'The student is at {grade_level} level. Adjust your language and complexity accordingly.\n'
 
-    prompt = f"""You are an educational AI assistant. Your job is to answer student questions 
-strictly based on the curriculum content provided below. 
+#     prompt = f"""You are an educational AI assistant. Your job is to answer student questions 
+# strictly based on the curriculum content provided below. 
 
-{grade_instruction}
-IMPORTANT RULES:
-- Only use information from the provided curriculum context.
-- If the answer is not in the context, say: "I could not find this in the curriculum. Please refer to your teacher."
-- Be clear, concise, and educational in your response.
-- Do not make up information.
+# {grade_instruction}
+# IMPORTANT RULES:
+# - Only use information from the provided curriculum context.
+# - If the answer is not in the context, say: "I could not find this in the curriculum. Please refer to your teacher."
+# - Be clear, concise, and educational in your response.
+# - Do not make up information.
 
-CURRICULUM CONTEXT:
-{context}
+# CURRICULUM CONTEXT:
+# {context}
 
-STUDENT QUESTION:
-{question}
+# STUDENT QUESTION:
+# {question}
 
-ANSWER:"""
+# ANSWER:"""
 
-    return prompt
+#     return prompt
 
 
-# generator.py
-# def build_prompt(question: str, context: str,  grade_level: Optional[GradeLevel] = None) -> str:
-#     prompt = temp.load_prompt_template()
-#     return prompt.format(
-#         institution_name=config.INSTITUTION_NAME,
-#         language=config.CLIENT_LANGUAGE,
-#         tone=config.CLIENT_TONE,
-#         grade_level=grade_level.value if grade_level else "",
-#         context=context,
-#         question=question,
-#     )
-
-# llm/generator.py
+def build_prompt(question: str, context: str,  grade_level: Optional[GradeLevel] = None) -> str:
+    prompt = temp.load_prompt_template()
+    return prompt.format(
+        institution_name=config.INSTITUTION_NAME,
+        language=config.CLIENT_LANGUAGE,
+        tone=config.CLIENT_TONE,
+        grade_level=grade_level.value if grade_level else "",
+        context=context,
+        question=question,
+    )
 
 def build_sources(chunks: list[dict]) -> list[dict]:
     """
@@ -228,18 +225,6 @@ def generate_answer(question: str, chunks: list[dict], grade_level: str = None) 
         answer = response.choices[0].message.content.strip()
         logger.debug('Answer generated successfully')
 
-        # Step 4: Build sources list
-        # sources = []
-        # seen_urls = set()
-        # for chunk in chunks:
-        #     url = chunk['metadata'].get('url', '')
-        #     if url and url not in seen_urls:
-        #         seen_urls.add(url)
-        #         sources.append({
-        #             'title': chunk['metadata'].get('title', 'Unknown'),
-        #             'source_type': chunk['metadata'].get('source_type', 'unknown'),
-        #             'url': url,
-        #         })
         sources = build_sources(chunks)
         return {
             'answer': answer,

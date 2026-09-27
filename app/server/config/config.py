@@ -29,6 +29,6 @@ LOG_FILE_NAME = os.environ.get("LOG_FILE_NAME", "app")
 
 # Below is to control the dynamic prompting - HOLD
 # SYSTEM_PROMPT_BASE = os.environ.get("SYSTEM_PROMPT_BASE", DEFAULT_PROMPT)
-# CLIENT_TONE = os.environ.get("CLIENT_TONE", "educational")
-# CLIENT_LANGUAGE = os.environ.get("CLIENT_LANGUAGE", "english")
-# INSTITUTION_NAME  = os.environ.get("INSTITUTION_NAME ", ""EduLens AI"")
+CLIENT_TONE = os.environ.get("CLIENT_TONE", "educational")
+CLIENT_LANGUAGE = os.environ.get("CLIENT_LANGUAGE", "english")
+INSTITUTION_NAME  = os.environ.get("INSTITUTION_NAME ", "EduLens AI")
