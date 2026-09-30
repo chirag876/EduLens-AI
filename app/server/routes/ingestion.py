@@ -1,40 +1,30 @@
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.server.database import core_data as db
-from app.server.models.ingestion_model import PDFIngestionRequest, VideoIngestionRequest
-from app.server.static.collections import Collections
+from app.server.models.ingestion_model import IngestionRequest
 from app.server.services.tasks.ingestion_task import ingest_task
-from app.server.static.enums import SourceType
-
+from app.server.config.source_config import SOURCE_CONFIG
 router = APIRouter()
 
 
-@router.post('/ingest/pdf', summary='Ingest a PDF document into the curriculum')
-async def ingest_pdf_route(params: PDFIngestionRequest) -> dict[str, Any]:
+@router.post('/ingest', summary='Ingest a source into the curriculum')
+async def ingest_route(params: IngestionRequest) -> dict[str, Any]:
+    if params.source_type not in SOURCE_CONFIG:
+        raise HTTPException(
+            status_code=400,
+            detail=f'Unsupported source type: {params.source_type.value}',
+        )
+
     task = ingest_task.delay(
-        source_type=SourceType.PDF,
+        source_type=params.source_type,
         url=str(params.url),
-        title=params.title
+        title=params.title,
     )
     return {
         'job_id': task.id,
         'status': 'queued',
-        'message': f'PDF ingestion started for: {params.title}',
-    }
-
-
-@router.post('/ingest/video', summary='Ingest a video into the curriculum')
-async def ingest_video_route(params: VideoIngestionRequest) -> dict[str, Any]:
-    task = ingest_task.delay(
-        source_type=SourceType.VIDEO,
-        url=str(params.url),
-        title=params.title
-    )
-    return {
-        'job_id': task.id,
-        'status': 'queued',
-        'message': f'Video ingestion started for: {params.title}',
+        'message': f'{params.source_type.value.capitalize()} ingestion started for: {params.title}',
     }
 
 
@@ -58,28 +48,20 @@ async def get_job_status(job_id: str) -> dict[str, Any]:
     return {'job_id': job_id, 'status': task.state}
 
 
-@router.delete('/ingest/pdf', summary='Delete an ingested PDF from curriculum')
-async def delete_pdf_route(title: str) -> dict[str, Any]:
-
-    result = db.delete_documents_by_filter(
-        collection_name=Collections.PDF_CHUNKS,
-        where={'title': title}
-    )
+@router.delete('/ingest', summary='Delete an ingested source from curriculum')
+async def delete_route(title: str) -> dict[str, Any]:
+    deleted: dict[str, int] = {}
+    for source_type, config in SOURCE_CONFIG.items():
+        result = db.delete_documents_by_filter(
+            collection_name=config.collection,
+            where={'title': title},
+        )
+        deleted[source_type.value] = result['deleted_count']
+ 
     return {
         'title': title,
-        'deleted_chunks': result['deleted_count'],
-        'message': 'Deleted successfully'
+        'deleted_chunks': sum(deleted.values()),
+        'deleted_by_source': deleted,
+        'message': 'Deleted successfully',
     }
-
-
-@router.delete('/ingest/video', summary='Delete an ingested video from curriculum')
-async def delete_video_route(title: str) -> dict[str, Any]:
-    result = db.delete_documents_by_filter(
-        collection_name=Collections.VIDEO_CHUNKS,
-        where={'title': title}
-    )
-    return {
-        'title': title,
-        'deleted_chunks': result['deleted_count'],
-        'message': 'Deleted successfully'
-    }
+ 
