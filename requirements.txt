@@ -779,3 +779,9 @@ yt-dlp==2026.8.19
 # Purpose: Zstandard bindings for Python
 # Dependency of: langsmith
 zstandard==0.25.0
+
+
+# fastapi-pagination
+# Purpose: FastAPI pagination
+# Dependency of: Project / directly installed
+fastapi-pagination==0.16.0

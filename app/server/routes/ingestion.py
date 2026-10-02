@@ -1,19 +1,38 @@
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException
-from app.server.database import core_data as db
-from app.server.models.ingestion_model import IngestionRequest
-from app.server.services.tasks.ingestion_task import ingest_task
+from fastapi_pagination import Page, paginate
+
 from app.server.config.source_config import SOURCE_CONFIG
+from app.server.ingestion.duplicate_check import find_duplicate
+from app.server.models.ingestion_model import IngestedDocument, IngestionRequest
+from app.server.services import document_service
+from app.server.services.tasks.ingestion_task import ingest_task
+from app.server.static.enums import SourceType
+
 router = APIRouter()
 
 
+# Plain `def` (not `async def`) on the routes that call ChromaDB: Chroma is a
+# blocking library, FastAPI runs `def` routes in a threadpool so the event loop stays free.
 @router.post('/ingest', summary='Ingest a source into the curriculum')
-async def ingest_route(params: IngestionRequest) -> dict[str, Any]:
-    if params.source_type not in SOURCE_CONFIG:
+def ingest_route(params: IngestionRequest) -> dict[str, Any]:
+    config = SOURCE_CONFIG.get(params.source_type)
+    if not config:
         raise HTTPException(
             status_code=400,
             detail=f'Unsupported source type: {params.source_type.value}',
+        )
+
+    # Same title or same url within this source type -> reject before queueing
+    duplicate = find_duplicate(config.collection, params.title, str(params.url))
+    if duplicate:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"A {params.source_type.value.upper()} with the same {duplicate['reason']} "
+                f"is already ingested (title: '{duplicate['title']}', doc_id: {duplicate['doc_id']})"
+            ),
         )
 
     task = ingest_task.delay(
@@ -26,6 +45,11 @@ async def ingest_route(params: IngestionRequest) -> dict[str, Any]:
         'status': 'queued',
         'message': f'{params.source_type.value.capitalize()} ingestion started for: {params.title}',
     }
+
+
+@router.get('/ingest', summary='List ingested documents (paginated)')
+def list_route(source_type: Optional[SourceType] = None) -> Page[IngestedDocument]:
+    return paginate(document_service.list_documents(source_type))
 
 
 @router.get('/ingest/status/{job_id}', summary='Check ingestion job status')
@@ -48,20 +72,17 @@ async def get_job_status(job_id: str) -> dict[str, Any]:
     return {'job_id': job_id, 'status': task.state}
 
 
-@router.delete('/ingest', summary='Delete an ingested source from curriculum')
-async def delete_route(title: str) -> dict[str, Any]:
-    deleted: dict[str, int] = {}
-    for source_type, config in SOURCE_CONFIG.items():
-        result = db.delete_documents_by_filter(
-            collection_name=config.collection,
-            where={'title': title},
-        )
-        deleted[source_type.value] = result['deleted_count']
- 
+@router.delete('/ingest', summary='Delete an ingested document by doc_id')
+def delete_route(doc_id: str) -> dict[str, Any]:
+    deleted = document_service.delete_document(doc_id)
+    total = sum(deleted.values())
+
+    if total == 0:
+        raise HTTPException(status_code=404, detail=f'No document found with doc_id: {doc_id}')
+
     return {
-        'title': title,
-        'deleted_chunks': sum(deleted.values()),
+        'doc_id': doc_id,
+        'deleted_chunks': total,
         'deleted_by_source': deleted,
         'message': 'Deleted successfully',
     }
- 

@@ -12,6 +12,7 @@
 
 import os
 import uuid
+from datetime import datetime, timezone
 
 import yt_dlp
 from faster_whisper import WhisperModel
@@ -19,6 +20,7 @@ from fastapi import status
 
 from app.server.config import config
 from app.server.database import core_data as db
+from app.server.ingestion.duplicate_check import find_duplicate
 from app.server.embeddings.embedder import generate_embeddings
 from app.server.handler.error_handler import CustomHTTPException
 from app.server.logger.custom_logger import logger
@@ -153,64 +155,68 @@ async def ingest_video(url: str, title: str) -> dict:
     """
     Full ingestion pipeline for a video:
     Download Audio → Transcribe → Clean → Chunk → Embed → Store in ChromaDB.
-
+ 
     Args:
         url (str): URL of the video (YouTube or other supported platform).
         title (str): Title/name of the video.
-
+ 
     Returns:
         dict: Summary of ingestion with chunk count.
     """
     logger.debug(f'Starting video ingestion: {title}')
     audio_path = None
-    existing = db.count_documents_by_filter(
-        collection_name=Collections.VIDEO_CHUNKS,
-        where={'title': title}
-    )
-    if existing['count'] > 0:
-        logger.debug(f'Video already ingested: {title} — skipping')
+    # Duplicate check (safety net — the route already rejects duplicates with 409)
+    # same title OR same url in the video collection -> skip
+    duplicate = find_duplicate(Collections.VIDEO_CHUNKS, title, url)
+    if duplicate:
+        logger.debug(f"Video already ingested (same {duplicate['reason']}): {title} — skipping")
         return {
+            'doc_id': duplicate['doc_id'],
             'title': title,
             'url': url,
-            'total_chunks': existing['count'],
-            'source_type': SourceType.VIDEO,
-            'message': 'Already ingested — skipped duplicate',
+            'source_type': SourceType.VIDEO.value,
+            'message': f"Already ingested (same {duplicate['reason']}) — skipped duplicate",
         }
     else:
-
+        # One doc_id + timestamp for the whole document (every chunk carries the same values)
+        doc_id = str(uuid.uuid4())
+        ingested_at = datetime.now(timezone.utc).isoformat()
+ 
         try:
             # Step 1: Download audio only
             audio_path = download_audio(url)
-
+ 
             # Step 2: Transcribe audio to text
             raw_transcript = transcribe_audio(audio_path)
-
+ 
             # Step 3: Clean transcript
             cleaned_transcript = clean_transcript_text(raw_transcript)
-
+ 
             # Step 4: Chunk text
             metadata = {
-                'source_type': SourceType.VIDEO,
+                'doc_id': doc_id,
+                'ingested_at': ingested_at,
+                'source_type': SourceType.VIDEO.value,
                 'title': title,
                 'url': url,
             }
             chunks = chunk_text(cleaned_transcript, metadata)
-
+ 
             if not chunks:
                 raise CustomHTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail=f'No chunks generated from video: {title}',
                     identifier=error_identifier.VIDEO_INGESTION_FAILED,
                 )
-
+ 
             # Step 5: Generate embeddings
             texts = [chunk['text'] for chunk in chunks]
             embeddings = generate_embeddings(texts)
-
+ 
             # Step 6: Prepare data for ChromaDB
             ids = [str(uuid.uuid4()) for _ in chunks]
             metadatas = [chunk['metadata'] for chunk in chunks]
-
+ 
             # Step 7: Store in ChromaDB
             db.add_documents(
                 collection_name=Collections.VIDEO_CHUNKS,
@@ -219,16 +225,17 @@ async def ingest_video(url: str, title: str) -> dict:
                 metadatas=metadatas,
                 ids=ids,
             )
-
+ 
             logger.debug(f'Video ingestion complete: {title} — {len(chunks)} chunks stored')
-
+ 
             return {
+                'doc_id': doc_id,
                 'title': title,
                 'url': url,
                 'total_chunks': len(chunks),
-                'source_type': SourceType.VIDEO,
+                'source_type': SourceType.VIDEO.value,
             }
-
+ 
         finally:
             # Always delete temp audio file even if ingestion fails
             if audio_path:

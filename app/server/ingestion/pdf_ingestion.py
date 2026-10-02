@@ -10,6 +10,7 @@
 # the PDF to disk during ingestion.
 
 import uuid
+from datetime import datetime, timezone
 from io import BytesIO
 
 import pymupdf as fitz  # PyMuPDF
@@ -18,6 +19,7 @@ from fastapi import status
 
 from app.server.database import core_data as db
 from app.server.embeddings.embedder import generate_embeddings
+from app.server.ingestion.duplicate_check import find_duplicate
 from app.server.handler.error_handler import CustomHTTPException
 from app.server.logger.custom_logger import logger
 from app.server.processing.cleaner import clean_pdf_text
@@ -120,20 +122,22 @@ async def ingest_pdf(url: str, title: str) -> dict:
     """
     logger.debug(f'Starting PDF ingestion: {title}')
 
-    # Duplicate check — agar same title already ingested hai toh skip karo
-    existing = db.count_documents_by_filter(
-        collection_name=Collections.PDF_CHUNKS,
-        where={'title': title}
-    )
-    if existing['count'] > 0:
-        logger.debug(f'PDF already ingested: {title} — skipping')
+    # Duplicate check (safety net — the route already rejects duplicates with 409)
+    # same title OR same url in the PDF collection -> skip
+    duplicate = find_duplicate(Collections.PDF_CHUNKS, title, url)
+    if duplicate:
+        logger.debug(f"PDF already ingested (same {duplicate['reason']}): {title} — skipping")
         return {
+            'doc_id': duplicate['doc_id'],
             'title': title,
             'url': url,
-            'total_chunks': existing['count'],
-            'source_type': SourceType.PDF,
-            'message': 'Already ingested : skipped duplicate',
+            'source_type': SourceType.PDF.value,
+            'message': f"Already ingested (same {duplicate['reason']}) : skipped duplicate",
         }
+
+    # One doc_id + timestamp for the whole document (every chunk carries the same values)
+    doc_id = str(uuid.uuid4())
+    ingested_at = datetime.now(timezone.utc).isoformat()
 
     # Step 1: Fetch PDF bytes into memory
     pdf_bytes = await fetch_pdf_bytes(url)
@@ -169,6 +173,8 @@ async def ingest_pdf(url: str, title: str) -> dict:
                 if 'metadata' not in chunk or not isinstance(chunk['metadata'], dict):
                     chunk['metadata'] = {}
 
+                chunk['metadata']['doc_id'] = doc_id
+                chunk['metadata']['ingested_at'] = ingested_at
                 chunk['metadata']['source_type'] = src_type_str
                 chunk['metadata']['title'] = title
                 chunk['metadata']['url'] = url
@@ -208,6 +214,7 @@ async def ingest_pdf(url: str, title: str) -> dict:
     logger.debug(f'PDF ingestion complete: {title} — {len(all_chunks)} chunks stored')
 
     return {
+        'doc_id': doc_id,
         'title': title,
         'url': url,
         'total_chunks': len(all_chunks),

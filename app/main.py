@@ -6,7 +6,7 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html, get_swagge
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import ORJSONResponse
 from starlette.exceptions import HTTPException
-
+from fastapi_pagination import add_pagination
 from app.server.config import config
 from app.server.handler.error_handler import (
     CustomHTTPException,
@@ -45,7 +45,7 @@ app.include_router(GZIP_REQUEST_ROUTE)
 # NOTE: Routes will be added here as they are built
 app.include_router(INGESTION, tags=['INGESTION'], prefix='/api/v1')
 app.include_router(QUERY, tags=['QUERY'], prefix='/api/v1')
-
+add_pagination(app)
 # add exception handlers
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)

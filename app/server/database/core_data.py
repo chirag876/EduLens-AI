@@ -120,70 +120,126 @@ def query_documents(
         ) from error
 
 
-def delete_documents(
-    collection_name: str,
-    ids: list[str],
-) -> dict[str, Any]:
-    """
-    Delete documents from a ChromaDB collection by IDs.
+# def delete_documents(
+#     collection_name: str,
+#     ids: list[str],
+# ) -> dict[str, Any]:
+#     """
+#     Delete documents from a ChromaDB collection by IDs.
 
-    Args:
-        collection_name (str): The name of the collection.
-        ids (list[str]): The list of document IDs to delete.
+#     Args:
+#         collection_name (str): The name of the collection.
+#         ids (list[str]): The list of document IDs to delete.
 
-    Returns:
-        dict[str, Any]: A dictionary with the count of deleted documents.
-    """
-    if not ids:
-        raise CustomHTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f'{collection_name}: ids cannot be empty',
-            identifier=error_identifier.UNPROCESS_ENTITY,
-        )
+#     Returns:
+#         dict[str, Any]: A dictionary with the count of deleted documents.
+#     """
+#     if not ids:
+#         raise CustomHTTPException(
+#             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+#             detail=f'{collection_name}: ids cannot be empty',
+#             identifier=error_identifier.UNPROCESS_ENTITY,
+#         )
 
-    try:
-        collection = get_collection(collection_name)
-        collection.delete(ids=ids)
-        return {'deleted_count': len(ids)}
-    except Exception as error:
-        raise CustomHTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'{collection_name}: Failed to delete documents — {str(error)}',
-            identifier=error_identifier.INTERNAL_SERVER_ERROR,
-        ) from error
+#     try:
+#         collection = get_collection(collection_name)
+#         collection.delete(ids=ids)
+#         return {'deleted_count': len(ids)}
+#     except Exception as error:
+#         raise CustomHTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail=f'{collection_name}: Failed to delete documents — {str(error)}',
+#             identifier=error_identifier.INTERNAL_SERVER_ERROR,
+#         ) from error
 
 
-def count_documents(collection_name: str) -> dict[str, Any]:
-    """
-    Count the number of documents in a ChromaDB collection.
+# def count_documents(collection_name: str) -> dict[str, Any]:
+#     """
+#     Count the number of documents in a ChromaDB collection.
 
-    Args:
-        collection_name (str): The name of the collection.
+#     Args:
+#         collection_name (str): The name of the collection.
 
-    Returns:
-        dict[str, Any]: A dictionary with the document count.
-    """
-    try:
-        collection = get_collection(collection_name)
-        return {'count': collection.count()}
-    except Exception as error:
-        raise CustomHTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'{collection_name}: Failed to count documents — {str(error)}',
-            identifier=error_identifier.INTERNAL_SERVER_ERROR,
-        ) from error
+#     Returns:
+#         dict[str, Any]: A dictionary with the document count.
+#     """
+#     try:
+#         collection = get_collection(collection_name)
+#         return {'count': collection.count()}
+#     except Exception as error:
+#         raise CustomHTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail=f'{collection_name}: Failed to count documents — {str(error)}',
+#             identifier=error_identifier.INTERNAL_SERVER_ERROR,
+#         ) from error
         
-def count_documents_by_filter(collection_name: str, where: dict) -> dict[str, Any]:
+# def count_documents_by_filter(collection_name: str, where: dict) -> dict[str, Any]:
+#     """
+#     Count documents in a ChromaDB collection matching a metadata filter.
+#     """
+#     try:
+#         collection = get_collection(collection_name)
+#         results = collection.get(where=where, include=[])  # only want the ids not the complete document
+#         return {'count': len(results['ids'])}
+#     except Exception as error:
+#         raise CustomHTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail=f'{collection_name}: Failed to count by filter — {str(error)}',
+#             identifier=error_identifier.INTERNAL_SERVER_ERROR,
+#         ) from error
+
+
+def get_metadatas_by_filter(
+    collection_name: str,
+    where: Optional[dict[str, Any]] = None,
+    limit: Optional[int] = None,
+    batch_size: int = 1000,
+) -> list[dict[str, Any]]:
     """
-    Count documents in a ChromaDB collection matching a metadata filter.
+    Fetch only the metadata (no documents, no embeddings) of chunks in a collection.
+    Reads in batches so a big collection does not hit the SQLite variable limit.
+
+    Args:
+        collection_name (str): The name of the collection.
+        where (dict, optional): Metadata filter. None means the whole collection.
+        limit (int, optional): Stop after this many records. None means everything.
+        batch_size (int): Records fetched per round trip.
+
+    Returns:
+        list[dict[str, Any]]: One metadata dict per chunk.
     """
     try:
         collection = get_collection(collection_name)
-        results = collection.get(where=where, include=[]) # only want the ids not the complete document
-        return {'count': len(results['ids'])}
-    except Exception:
-        return {'count': 0}
-    
+        metadatas: list[dict[str, Any]] = []
+        offset = 0
+
+        while True:
+            batch_limit = batch_size if limit is None else min(batch_size, limit - len(metadatas))
+            if batch_limit <= 0:
+                break
+
+            kwargs: dict[str, Any] = {'include': ['metadatas'], 'limit': batch_limit, 'offset': offset}
+            if where:
+                kwargs['where'] = where
+
+            batch = collection.get(**kwargs)['metadatas'] or []
+            if not batch:
+                break
+
+            metadatas.extend(batch)
+            if len(batch) < batch_limit:
+                break
+            offset += len(batch)
+
+        return metadatas
+    except Exception as error:
+        raise CustomHTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'{collection_name}: Failed to read metadata — {str(error)}',
+            identifier=error_identifier.INTERNAL_SERVER_ERROR,
+        ) from error
+
+
 def delete_documents_by_filter(collection_name: str, where: dict) -> dict[str, Any]:
     """
     Delete documents from ChromaDB by metadata filter.
