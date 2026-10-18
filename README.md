@@ -195,34 +195,6 @@ POST /api/v1/query
 
 ---
 
-## Project Structure
-
-```
-EduLens-AI/
-├── app/
-│   ├── main.py
-│   └── server/
-│       ├── config/          # Environment configuration
-│       ├── database/        # ChromaDB client and core data operations
-│       ├── embeddings/      # Sentence Transformer singleton + batch embedding
-│       ├── ingestion/       # PDF and video ingestion pipelines
-│       ├── llm/             # Groq answer generation and prompt construction
-│       ├── models/          # Pydantic request/response schemas
-│       ├── personalization/ # Grade-level response formatting
-│       ├── processing/      # Text cleaning and chunking
-│       ├── retrieval/       # Semantic search across collections
-│       ├── routes/          # FastAPI route definitions
-│       ├── safety/          # Answer moderation layer
-│       ├── static/          # Enums, constants, error identifiers
-│       └── utils/           # Shared utility functions
-├── docs/                    # Architecture diagrams and documentation
-├── temp_videos/             # Temporary audio files (auto-deleted post-ingestion)
-├── requirements.txt
-└── README.md
-```
-
----
-
 ## Getting Started
 
 ### Prerequisites
@@ -264,7 +236,6 @@ API docs available at: `http://127.0.0.1:8000/docs`
 
 ## Upcoming Features
 
-- **Background Job Processing** — Celery + Redis based async ingestion so users are not blocked during large document processing
 - **Global Structured Logging** — Cloud-agnostic logging system with per-step ingestion timing for performance monitoring
 - **Groq Whisper API Integration** — Replace local Whisper with Groq's hosted Whisper for significantly faster video transcription
 - **Multi-language Support** — Configurable response language per institution
